@@ -69,10 +69,13 @@ typedef enum riscvTZE {
 } riscvTZ;
 
 //
-// This defines a bit in the polymorphic key indicating whether the current
-// rounding mode is valid
+// This subdivides the polymorphic key into parts used by the vector extension
+// and transaction mode
 //
-#define RM_VALID_MASK   (1<<6)
+typedef enum riscvPMKE {
+    PMK_VECTOR      = 0x00ff,
+    PMK_TRANSACTION = 0x8000,
+} riscvPMK;
 
 //
 // This structure holds state for a code block as it is morphed
@@ -80,8 +83,8 @@ typedef enum riscvTZE {
 typedef struct riscvBlockStateS {
 
     riscvBlockStateP prevState;     // previous block state
-    Uns32            fpNaNBoxMask;  // mask of known single-precision FP registers
-    Bool             fpInstDone;    // floating-point instruction already seen?
+    Uns32            fpNaNBoxMask[2];// mask of known NaN-boxed registers
+    Bool             FSDirty;       // is status.FS known to be dirty?
     riscvSEWMt       SEWMt;         // known active vector SEW
     riscvVLMULMt     VLMULMt;       // known active vector VLMUL
     riscvVLClassMt   VLClassMt;     // known active vector VL zero/non-zero/max

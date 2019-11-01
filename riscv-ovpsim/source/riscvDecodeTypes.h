@@ -263,6 +263,7 @@ typedef enum riscvITypeE {
     RV_IT_VDOT_VV,
 
     // V-extension FVV/FVF-type common instructions
+    RV_IT_VFMERGE_VR,
     RV_IT_VFADD_VR,
     RV_IT_VFSUB_VR,
     RV_IT_VFRSUB_VR,
@@ -335,8 +336,8 @@ typedef enum riscvITypeE {
     RV_IT_VREDMAXU_VS,
     RV_IT_VREDMAX_VS,
     RV_IT_VEXT_X_V,
-    RV_IT_VMPOPC_M,
-    RV_IT_VMFIRST_M,
+    RV_IT_VPOPC_M,
+    RV_IT_VFIRST_M,
     RV_IT_VMSBF_M,
     RV_IT_VMSOF_M,
     RV_IT_VMSIF_M,
