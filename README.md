@@ -1,26 +1,63 @@
-# RISC-V Compliance Task Group
 
-This is a repository for the work of the RISC-V Foundation Compliance Task Group. The repository owners are:
-- Jeremy Bennett (Embecosm)
-- Lee Moore (Imperas)
+# RISC-V Architecture Test SIG
 
-Details of the RISC-V Foundation, the work of its task groups, and how to become a member can be found at [riscv.org](https://riscv.org/).
+This is a repository for the work of the RISC-V Foundation Architecture Test SIG. The repository owners are:
+
+- Neel Gala (InCore Semiconductors)
+- Marc Karasek (Inspire Semiconductors)
+
+Quick Links:
+
+  - Details of the RISC-V Foundation, the work of its task groups, and how to become a member can be found at [riscv.org](https://riscv.org/).
+  - For more details and documentation on the current test environment see: [doc/README.adoc](doc/README.adoc)
+  - For more details on the test format spec see: [spec/TestFormatSpec.adoc](spec/TestFormatSpec.adoc)
+  - For contributions and reporting issues please refer to [CONTRIBUTION.md](CONTRIBUTION.md)
+  - For more details on the usage of the current framework see : [RISCOF](https://riscof.readthedocs.io/)
+
+**Note : The RISCOF framework requires a
+[riscv-config](https://github.com/riscv-software-src/riscv-config) YAML to describe the
+configurations implemented by the DUT**
+
+## Old Framework
+
+The older 2.x version of the framework (based on Makefiles) can be found in a separate branch :
+[old-framework-2.x](https://github.com/riscv-non-isa/riscv-arch-test/tree/old-framework-2.x). This
+branch is no longer officially supported and all changes must occur on the main branch.
+
+## Test Disclaimers
+
+The following are the exhaustive list of disclaimers that can be used as waivers by target owners 
+when reporting the status of pass/fail on the execution of the architectural suite on their respective targets.
+
+1. For the following set of misaligned-tests, signature mismatches will occur if misaligned accesses can sometimes succeed (without an exception) and sometimes fail on the DUT.
+
+   1. rv32i_m/privilege/src/misalign-[lb[u],lh[u],lw,sh,sb,sw]-01.S
+   2. rv64i_m/privilege/src/misalign-[lb[u],lh[u],lw[u],ld,sb,sh,sw,sd]-01.S
+
+3. The machine mode trap handler used in the privilege tests assumes one of the following conditions. 
+   Targets not satisfying any of the following conditions are bound to fail the entire 
+   rv32i_m/privilege and rv64i_m/privilege tests:
+   1. The target must have implemented mtvec which is completely writable by the test in machine mode.
+   2. The target has initialized mtvec, before entering the test (via RVMODEL_BOOT), to point to a memory location which has both read and write permissions.
+
+## Test Stats
+
+The coverage and data propogation statistics of each test are hosted on
+[Google-Drive](https://drive.google.com/drive/folders/1KBRy6OgxnOPTDgyfJDj0gcMi5VdMLtVo?usp=share_link) for reference. This to avoid bloating this repo in size.
 
 ## Contribution process
 
-You are encouraged to contribute to this repository by submitting pull requests and by commenting on pull requests submitted by other people.
-
-- Where a pull request is non-controversial one of the repository owners will immediately merge it. The repository uses rebase merges to maintain a linear history.
-
-- Other pull requests will be publicised to the task group for comment and decision at a subsequent meeting of the group. Everyone is encouraged to comment on a pull request. Such pull requests will be merged by when a concensus/decision has been reached by the task group.
+Please refer to to [CONTRIBUTION.md](CONTRIBUTION.md) for guidelines on contributions.
 
 ## Licensing
 
 In general:
-- code is licensed under the BSD 3-clause license (SPDX license identifier `BSD-3-Clause`); while
+- code is licensed under one of the following:
+  - the BSD 3-clause license (SPDX license identifier `BSD-3-Clause`);
+  - the Apache License (SPDX license identifier `Apache-2.0`); while
 - documentation is licensed under the Creative Commons Attribution 4.0 International license (SPDX license identifier `CC-BY-4.0`).
 
-The files [`COPYING.BSD`](./COPYING.BSD) and [`COPYING.CC`](./COPYING.CC) in the top level directory contain the complete text of these licenses.
+The files [`COPYING.BSD`](./COPYING.BSD), [`COPYING.APACHE`](./COPYING.APACHE) and [`COPYING.CC`](./COPYING.CC) in the top level directory contain the complete text of these licenses.
 
 ## Engineering practice
 
@@ -33,61 +70,12 @@ The files [`COPYING.BSD`](./COPYING.BSD) and [`COPYING.CC`](./COPYING.CC) in the
 // SPDX-License-Identifier: BSD-3-Clause
 ```
 
-## Running the compliance tests
+## Quick Links:
 
-The only setup required is to define where the toolchain is found, and where the target / device is found.
+- RISCOF \[[DOCS](https://riscof.readthedocs.io/en/latest/)\] \[[REPO](https://github.com/riscv-software-src/riscof)\]: This is the next version of the architectural test framework currently under development
+- RISCV-ISAC \[[DOCS](https://riscv-isac.readthedocs.io/en/latest/index.html)\] \[[REPO](https://github.com/riscv-software-src/riscv-isac)\] : This is an ISA level coverage extraction tool for RISC-V which used to generate the coverage statistics of the architectural tests.
+- RISCV-CTG: \[[DOCS](https://riscv-ctg.readthedocs.io/en/latest/index.html)\]\[[REPO](https://github.com/riscv-software-src/riscv-ctg)\]: This is a RISC-V Architectural Test generator used to generate some of the tests already checked into this repository.
+- [Videos](https://youtu.be/VIW1or1Oubo): This Global Forum 2020 video provides an introduction to the above mentioned tools
+- [riscvOVPsim](https://github.com/riscv-ovpsim/imperas-riscv-tests): Imperas freeware RISC-V reference simulator for compliance testing
+- [riscvOVPsimPlus](https://www.ovpworld.org/riscvOVPsimPlus/): Imperas enhanced freeware RISC-V reference simulator for test development and verification
 
-For the toolchain, the binaries must be in the search path and the compiler prefix is defined on the make line. The default value for this is
-
-    RISCV_PREFIX ?= riscv64-unknown-elf-
-
-The path to the RUN_TARGET is defined within the riscv-target Makefile.include.
-
-To run the rv32i test suite on riscvOVPsim
-
-    make RISCV_TARGET=riscvOVPsim RISCV_DEVICE=rv32i
-
-### Accessing riscvOVPsim
-
-As we create the RISCV.org compliance test suite, the Imperas developed _riscvOVPsim_ compliance simulator is included as part of this GitHub repository. For more information please contact info@ovpworld.org or info@imperas.com.
-
-For more information on riscvOVPsim look here: [riscv-ovpsim/README.md](riscv-ovpsim/README.md) and here: [riscv-ovpsim/doc/riscvOVPsim_User_Guide.pdf](riscv-ovpsim/doc/riscvOVPsim_User_Guide.pdf).
-
-### Using the simulators from the Sail RISC-V formal model
-
-The [Sail RISC-V formal model](https://github.com/rems-project/sail-riscv) generates two
-simulators, in C and OCaml.  They can be used as test targets for this compliance suite.
-
-For this purpose, the Sail model needs to be checked out and built on
-the machine running the compliance suite.  Follow the build
-instructions described the README for building the RV32 and RV64
-models.  Once built, please add `$SAIL_RISCV/c_emulator` and
-`$SAIL_RISCV/ocaml_emulator` to your path, where $SAIL_RISCV is the
-top-level directory containing the model.
-
-To test the compliance of the C simulator for the current RV32 and RV64 tests, use
-
-    make RISCV_TARGET=sail-riscv-c all_variant
-
-while the corresponding command for the OCaml simulator is
-
-    make RISCV_TARGET=sail-riscv-ocaml all_variant
-
-### Using the GRIFT simulator
-
-The [GRIFT](https://github.com/GaloisInc/grift) formal model and simulation tool
-can be used as a test target for this compliance suite.
-
-GRIFT needs to be cloned and built on the machine running the compliance
-suite. Follow the build instructions described in the README for building the
-GRIFT simulator. Once build, add the generated `grift-sim` executable to your
-path.
-
-To test the compliance of the GRIFT simulator for the current RV32 and RV64
-tests, use
-
-    make RISCV_TARGET=grift all_variant
-
-Note that the I-MISALIGN_LDST test fails for GRIFT because GRIFT currently
-supports misaligned loads and stores in hardware, while the test is specifically
-written for systems that trap on misaligned loads and stores.
